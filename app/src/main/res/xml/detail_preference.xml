@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:icon="@android:drawable/ic_dialog_map"
+        android:key="location"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="london"
+        android:title="Location"
+        android:visibility="visible" />
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/list_preference_entry_values"
+        android:entryValues="@array/pref_example_list_titles"
+        android:key="temp_units"
+        android:title="Pick your Units" />
+</PreferenceScreen>

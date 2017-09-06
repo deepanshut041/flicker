@@ -18,13 +18,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WeatherDetailActivity"
+        <activity
+            android:name=".WeatherDetailActivity"
             android:label="@string/WeatherDetail"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value="com.example.deepn.flicker.MainActivity" />
         </activity>
+        <activity android:name=".DetailSettingActivity"></activity>
     </application>
 
 </manifest>

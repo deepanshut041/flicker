@@ -1,6 +1,7 @@
 package com.example.deepn.flicker;
 
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -64,9 +65,8 @@ public class ForecastFragment extends Fragment {
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.forecast_toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         //Till Here
-
-
         setHasOptionsMenu(true);
+
         ListView listView = (ListView) rootView.findViewById(R.id.forecastList);
         ArrayList<String> arrayList = new ArrayList<>();
         for (int i = 0; i < 20; i++){
