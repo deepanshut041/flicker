@@ -1,6 +1,7 @@
 package com.example.deepn.flicker;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -83,7 +84,11 @@ public class ForecastFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecast = mForecastAdapter.getItem(position);
                 Log.v("list-clicked",forecast);
-                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+
+                //We pass second argument name of class which we want to include
+                Intent intent = new Intent(getActivity(),WeatherDetailActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(intent);
             }
         });
         return rootView;

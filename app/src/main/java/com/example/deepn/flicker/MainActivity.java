@@ -10,7 +10,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ForecastFragment forecastFargment = new ForecastFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.main_activity, forecastFargment).commit();
+        if (savedInstanceState == null){
+            ForecastFragment forecastFragment = new ForecastFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.main_activity, forecastFragment).commit();
+        }
     }
 }
