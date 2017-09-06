@@ -82,7 +82,8 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecast = mForecastAdapter.getItem(position);
-                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT);
+                Log.v("list-clicked",forecast);
+                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
             }
         });
         return rootView;

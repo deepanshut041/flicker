@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?attr/listPreferredItemHeight"
+    android:id="@+id/forcasttextview"
+    android:textSize="14sp"
     android:gravity="center_vertical"
     android:orientation="horizontal">
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="0dp"
-        android:layout_weight="4"
-        android:id="@+id/forcasttextview"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:textSize="18sp">
-    </TextView>
-    <Button
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="50dp"
-        android:text="hello"/>
-</LinearLayout>
+
+</TextView>
