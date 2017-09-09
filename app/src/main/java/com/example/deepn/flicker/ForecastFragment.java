@@ -3,8 +3,10 @@ package com.example.deepn.flicker;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -47,7 +49,16 @@ public class ForecastFragment extends Fragment {
         // Required empty public constructor
     }
 
-    //
+    //This function updates weather
+    public void updateWeather(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = sharedPreferences.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        FetchWeather fetchWeather = new FetchWeather();
+        fetchWeather.execute(location);
+
+    }
+    //This function creates weather
     @Override
     public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -69,9 +80,6 @@ public class ForecastFragment extends Fragment {
 
         ListView listView = (ListView) rootView.findViewById(R.id.forecastList);
         ArrayList<String> arrayList = new ArrayList<>();
-        for (int i = 0; i < 20; i++){
-            arrayList.add("List item " + i);
-        }
         mForecastAdapter = new ArrayAdapter<String>(getContext(),
                 R.layout.forecast_textview,
                 R.id.forcasttextview,
@@ -83,7 +91,7 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecast = mForecastAdapter.getItem(position);
-                Log.v("list-clicked",forecast);
+                //Log.v("list-clicked",forecast);
 
                 //We pass second argument name of class which we want to include
                 Intent intent = new Intent(getActivity(),WeatherDetailActivity.class);
@@ -93,16 +101,21 @@ public class ForecastFragment extends Fragment {
         });
         return rootView;
     }
-
+    @Override
+    public void onStart(){
+        super.onStart();
+        updateWeather();
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_setting:
+                Intent intent = new Intent(getActivity(), DetailSettingActivity.class);
+                startActivity(intent);
                 return true;
 
             case R.id.action_refresh:
-                FetchWeather fetchWeather = new FetchWeather();
-                fetchWeather.execute();
+                updateWeather();
                 return true;
 
             default:
@@ -110,38 +123,70 @@ public class ForecastFragment extends Fragment {
 
         }
     }
-    public class FetchWeather extends AsyncTask<Void,Void,String>{
+
+    public class FetchWeather extends AsyncTask<String,Void,String>{
         private ArrayList<String> jsonWeatherParser(String jsonForecast) throws JSONException {
             ArrayList<String> weatherArray = new ArrayList<>();
             JSONObject weatherObject = new JSONObject(jsonForecast);
-            JSONArray list = weatherObject.getJSONArray("list");
-            for (int i = 0; i < list.length(); i++){
-                JSONObject weather = list.getJSONObject(i);
-                DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-                Date netDate = (new Date(Long.parseLong(weather.get("dt").toString())));
-                String date = sdf.format(netDate);
-                JSONObject temp = (JSONObject) weather.get("temp");
-                String max_temp = temp.get("max").toString();
-                String min_temp = temp.get("min").toString();
-                weatherArray.add(date + " " + max_temp + " " + min_temp);
-                Log.v("output",date + " " + max_temp + " " + min_temp);
+            int cod = Integer.parseInt(weatherObject.get("cod").toString());
+            if (cod == 200) {
+                JSONArray list = weatherObject.getJSONArray("list");
+                for (int i = 0; i < list.length(); i++) {
+                    JSONObject weather = list.getJSONObject(i);
+                    DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                    Date netDate = (new Date(Long.parseLong(weather.get("dt").toString())));
+                    String date = sdf.format(netDate);
+                    JSONArray wether_array = weather.getJSONArray("weather");
+                    JSONObject weather_detail = wether_array.getJSONObject(0);
+                    String desc = weather_detail.get("main").toString();
+                    JSONObject temp = (JSONObject) weather.get("temp");
+                    String max_temp = temp.get("max").toString();
+                    String min_temp = temp.get("min").toString();
+                    String tempHighLow = tempratureConverter(max_temp, min_temp);
+                    weatherArray.add(date + "  " + desc + "  " + tempHighLow);
+                    //Log.v("output", date + "  " + desc + "  " + tempHighLow);
+                }
             }
             return weatherArray;
         }
+
+        private String tempratureConverter(String high,String low){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = sharedPreferences.getString(getString(R.string.pref_temp_key),
+                    getString(R.string.pref_temp_default));
+
+            double max = Double.parseDouble(high);
+            double min = Double.parseDouble(low);
+            max = max - 273;
+            min = min - 273;
+            if (unitType.equals(getString(R.string.pref_temp_imperial))){
+                max = (max * 1.8) + 32;
+                min = (min * 1.8) + 32;
+            }
+            else if (!unitType.equals(getString(R.string.pref_temp_metric))){
+                Log.d("unit","Unit type not found");
+            }
+            max = Math.round(max);
+            min = Math.round(min);
+
+            return max + "/" + min ;
+
+        }
         @Override
-        protected String doInBackground(Void... params) {
+        protected String doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String jsonForecast = null;
+            String location = params[0];
             try {
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=london,uk&APPID=c10e7100063f10864ba3ffb839aed7f3");
+                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q="+location+"&APPID=c10e7100063f10864ba3ffb839aed7f3");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
                 InputStream inputStream = urlConnection.getInputStream();
                 if(inputStream == null){
-                    jsonForecast = null;
+                    return null;
                 }
                 StringBuffer buffer = new StringBuffer();
                 reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -151,10 +196,10 @@ public class ForecastFragment extends Fragment {
                 }
 
                 if (buffer.length() == 0){
-                    jsonForecast = null;
+                    return null;
                 }
                 jsonForecast = buffer.toString();
-                //Log.v("output", jsonForecast);
+                Log.e("output", jsonForecast);
             }
             catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -179,14 +224,20 @@ public class ForecastFragment extends Fragment {
 
         protected void onPostExecute(String forecast){
             Log.v("post-output",forecast);
-            try {
-                ArrayList<String> forecastList = jsonWeatherParser( forecast );
-                if (forecastList.size() != 0) {
-                    mForecastAdapter.clear();
-                    mForecastAdapter.addAll(forecastList);
+            if (forecast != null) {
+                try {
+                    ArrayList<String> forecastList = jsonWeatherParser(forecast);
+                    if (forecastList.size() != 0) {
+                        mForecastAdapter.clear();
+                        mForecastAdapter.addAll(forecastList);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            }
+            else {
+                Toast toast = Toast.makeText(getActivity(),"Wrong pin code",Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
     }

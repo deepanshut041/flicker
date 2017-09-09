@@ -7,17 +7,28 @@
     <string name="refresh">REFRESH</string>
     <string name="WeatherDetail">WeatherDetail</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="Settings">Settings</string>
 
     <!-- Strings related to Settings -->
 
-    <string-array name="pref_example_list_titles">
-        <item>1</item>
-        <item>1</item>
-    </string-array>
 
-    <string-array name="list_preference_entry_values">
+    <!-- For location in setting -->
+    <string name="pref_location_label">Location</string>
+    <string name="pref_location_key">location</string>
+    <string name="pref_location_default">245205</string>
+
+    <!-- For Temprature unit in setting -->
+    <string name="pref_temp_label">Pick your Unit</string>
+    <string name="pref_temp_key">Unit</string>
+    <string name="pref_temp_default">metric</string>
+    <string name="pref_temp_imperial">imperial</string>
+    <string name="pref_temp_metric">metric</string>
+    <string-array name="list_preference_options">
         <item>Metric</item>
         <item>Imperial</item>
     </string-array>
-
+    <string-array name="list_preference_values">
+        <item>metric</item>
+        <item>imperial</item>
+    </string-array>
 </resources>
